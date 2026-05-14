@@ -1,36 +1,37 @@
-from openai import AsyncOpenAI
-from app.config import get_settings
-import tiktoken
+from sentence_transformers import SentenceTransformer
+import asyncio
 
-settings = get_settings()
-client = AsyncOpenAI(api_key=settings.openai_api_key)
+MODEL_NAME = "all-MiniLM-L6-v2"
+_model = None
 
-EMBEDDING_MODEL = "text-embedding-3-small"
+def get_model():
+    global _model
+    if _model is None:
+        print(f"Loading embedding model: {MODEL_NAME}")
+        _model = SentenceTransformer(MODEL_NAME)
+    return _model
+
 CHUNK_SIZE = 512
 CHUNK_OVERLAP = 50
 
 def chunk_text(text: str) -> list[str]:
-    enc = tiktoken.get_encoding("cl100k_base")
-    tokens = enc.encode(text)
+    words = text.split()
     chunks = []
     start = 0
-    while start < len(tokens):
-        end = min(start + CHUNK_SIZE, len(tokens))
-        chunk_tokens = tokens[start:end]
-        chunks.append(enc.decode(chunk_tokens))
+    while start < len(words):
+        end = min(start + CHUNK_SIZE, len(words))
+        chunks.append(" ".join(words[start:end]))
         start += CHUNK_SIZE - CHUNK_OVERLAP
     return chunks
 
 async def embed_text(text: str) -> list[float]:
-    response = await client.embeddings.create(
-        model=EMBEDDING_MODEL,
-        input=text,
-    )
-    return response.data[0].embedding
+    model = get_model()
+    loop = asyncio.get_event_loop()
+    embedding = await loop.run_in_executor(None, model.encode, text)
+    return embedding.tolist()
 
 async def embed_chunks(chunks: list[str]) -> list[list[float]]:
-    response = await client.embeddings.create(
-        model=EMBEDDING_MODEL,
-        input=chunks,
-    )
-    return [item.embedding for item in response.data]
+    model = get_model()
+    loop = asyncio.get_event_loop()
+    embeddings = await loop.run_in_executor(None, model.encode, chunks)
+    return embeddings.tolist()

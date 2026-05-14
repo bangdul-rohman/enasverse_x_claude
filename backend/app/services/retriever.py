@@ -10,7 +10,7 @@ import uuid
 settings = get_settings()
 client = AsyncQdrantClient(url=settings.qdrant_url)
 
-VECTOR_SIZE = 1536
+VECTOR_SIZE = 384
 
 async def init_collection():
     collections = await client.get_collections()

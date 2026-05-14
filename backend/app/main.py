@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from app.config import get_settings
 from app.services.retriever import init_collection
+from app.routers import query, documents
 
 settings = get_settings()
 
@@ -25,6 +26,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(query.router)
+app.include_router(documents.router)
 
 @app.get("/")
 async def root():
