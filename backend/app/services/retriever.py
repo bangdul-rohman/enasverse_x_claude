@@ -8,7 +8,7 @@ from app.services.embedder import embed_text, embed_chunks, chunk_text
 import uuid
 
 settings = get_settings()
-client = AsyncQdrantClient(url=settings.qdrant_url)
+client = AsyncQdrantClient(url=settings.qdrant_url, api_key=settings.qdrant_api_key or None)
 
 VECTOR_SIZE = 384
 

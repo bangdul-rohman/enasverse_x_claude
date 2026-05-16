@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     
     qdrant_url: str = "http://localhost:6333"
     qdrant_collection: str = "enasverse_docs"
+    qdrant_api_key: str = ""
     
     openai_api_key: str = ""
     anthropic_api_key: str = ""
