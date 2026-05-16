@@ -1,6 +1,6 @@
 import anthropic
 from app.config import get_settings
-from app.services.retriever import search_similar
+from app.services.retriever import search as search_similar
 
 settings = get_settings()
 client = anthropic.AsyncAnthropic(api_key=settings.anthropic_api_key)
