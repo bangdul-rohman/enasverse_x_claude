@@ -260,3 +260,45 @@ RAILWAY_TOKEN=
 - ✅ GitHub webhook updated ke Railway URL permanen
 - ✅ Fix: database.py auto-convert asyncpg, qdrant api_key, PORT env var
 - **Next session:** End-to-end test production + monitoring
+
+---
+## Update Sesi 4 (Lanjutan) — 2026-05-16
+
+### Bug Fixes yang Diselesaikan
+- ✅ database.py: auto-convert DATABASE_URL postgresql:// → postgresql+asyncpg://
+- ✅ database.py: fix import get_settings() bukan settings langsung
+- ✅ database.py: fix lowercase settings.database_url
+- ✅ config.py: tambah qdrant_api_key field
+- ✅ retriever.py: pass api_key ke AsyncQdrantClient
+- ✅ retriever.py: tambah create_payload_index() untuk tenant_id filter
+- ✅ Dockerfile: ganti hardcode port 8000 → ${PORT:-8000}
+- ✅ requirements.txt: tambah sentence-transformers, PyGithub, bcrypt==4.0.1
+- ✅ main.py: restore semua router (auth, agent, indexer)
+- ✅ models/user.py: restore User model
+- ✅ schemas/auth.py: restore auth schemas
+- ✅ routers/auth.py: restore auth router
+- ✅ routers/agent.py: restore agent router
+- ✅ routers/indexer.py: restore indexer router
+- ✅ services/auth.py: restore JWT + bcrypt service
+- ✅ services/agent.py: restore run_agent function
+- ✅ services/github_indexer.py: restore GitHub indexer
+- ✅ DATABASE_URL: ganti ke Railway PostgreSQL public URL (yamanote.proxy.rlwy.net)
+
+### End-to-End Test Production — BERHASIL
+- ✅ Register user → dapat id + tenant_id
+- ✅ Login → dapat JWT token
+- ✅ Index dokumen → indexed: 1
+- ✅ Query Claude → Claude jawab dengan konteks RAG
+
+### Monitoring Setup (In Progress)
+- 🔄 Betterstack — akun dibuat, belum connect source
+- **Next:** Connect source Betterstack → dapat token → integrasi ke FastAPI
+
+### Production URL
+- https://enasversexclaude-production.up.railway.app
+
+### Catatan Penting
+- Semua file yang hilang akibat git filter-branch sudah di-restore
+- DATABASE_URL harus pakai public URL Railway (bukan internal .railway.internal)
+- bcrypt harus pin ke 4.0.1
+- Qdrant butuh payload index untuk field tenant_id sebelum bisa filter
