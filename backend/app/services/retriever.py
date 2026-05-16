@@ -24,6 +24,7 @@ async def init_collection():
             ),
         )
         print(f"Collection '{settings.qdrant_collection}' created.")
+    await create_payload_index()
 
 async def index_document(
     text: str,
@@ -74,3 +75,15 @@ async def search(
         {"text": r.payload["text"], "score": r.score, "metadata": r.payload}
         for r in results
     ]
+
+
+async def create_payload_index():
+    from qdrant_client.models import PayloadSchemaType
+    try:
+        await client.create_payload_index(
+            collection_name=settings.qdrant_collection,
+            field_name="tenant_id",
+            field_schema=PayloadSchemaType.KEYWORD,
+        )
+    except Exception:
+        pass
