@@ -1,6 +1,7 @@
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import declarative_base, sessionmaker
-from app.config import settings
+from app.config import get_settings
+settings = get_settings()
 
 db_url = settings.DATABASE_URL
 if db_url.startswith("postgresql://"):
