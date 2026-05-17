@@ -21,6 +21,7 @@ class Settings(BaseSettings):
     
     github_token: str = ""
     github_webhook_secret: str = ""
+    betterstack_token: str = ""
 
     class Config:
         env_file = ".env"

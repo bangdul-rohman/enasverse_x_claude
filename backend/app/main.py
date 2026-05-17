@@ -5,6 +5,8 @@ from app.config import get_settings
 from app.database import engine, Base
 from app.services.retriever import init_collection
 from app.routers import query, documents, auth, agent, indexer
+from app.logger import setup_logger
+import logging
 
 settings = get_settings()
 
@@ -13,6 +15,8 @@ async def lifespan(app: FastAPI):
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     await init_collection()
+    logger = setup_logger(settings.betterstack_token)
+    logging.getLogger("enasverse").info("Enasverse API started", extra={"env": settings.app_env})
     yield
 
 app = FastAPI(

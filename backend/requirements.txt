@@ -18,3 +18,4 @@ qdrant-client==1.9.1
 tiktoken==0.7.0
 sentence-transformers==2.7.0
 PyGithub==2.3.0
+logtail-python==0.3.1
