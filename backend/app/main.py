@@ -15,7 +15,7 @@ async def lifespan(app: FastAPI):
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     await init_collection()
-    setup_logger(settings.betterstack_token)
+    setup_logger(settings.betterstack_token, settings.betterstack_host)
     logging.info("Enasverse API started")
     yield
 
