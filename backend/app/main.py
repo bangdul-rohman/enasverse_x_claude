@@ -2,7 +2,8 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.util import get_remote_address
+from app.limiter import limiter
+
 from slowapi.errors import RateLimitExceeded
 from contextlib import asynccontextmanager
 from app.config import get_settings
@@ -15,15 +16,8 @@ import logging
 
 settings = get_settings()
 
-from slowapi.util import get_remote_address
 
-def get_real_ip(request):
-    forwarded = request.headers.get("x-forwarded-for")
-    if forwarded:
-        return forwarded.split(",")[0].strip()
-    return get_remote_address(request)
 
-limiter = Limiter(key_func=get_real_ip, default_limits=["200/minute"])
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

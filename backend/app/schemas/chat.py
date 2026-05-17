@@ -14,7 +14,7 @@ class ChatMessageOut(BaseModel):
 
 class ChatSessionOut(BaseModel):
     id: str
-    user_id: int
+    user_id: str
     tenant_id: str
     title: str
     created_at: datetime

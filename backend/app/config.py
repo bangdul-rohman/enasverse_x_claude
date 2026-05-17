@@ -6,7 +6,7 @@ class Settings(BaseSettings):
     app_env: str = "development"
     secret_key: str = "dev-secret-key"
     
-    database_url: str = "postgresql+asyncpg://user:password@localhost:5432/enasverse"
+    database_url: str = "postgresql+asyncpg://enasverse:enasverse@localhost:5432/enasverse"
     
     qdrant_url: str = "http://localhost:6333"
     qdrant_collection: str = "enasverse_docs"

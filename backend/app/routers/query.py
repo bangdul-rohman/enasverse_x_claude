@@ -13,7 +13,7 @@ from app.database import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from qdrant_client.models import PointStruct
-from app.main import limiter
+from app.limiter import limiter
 from app.config import get_settings
 
 router = APIRouter(prefix="/query", tags=["query"])

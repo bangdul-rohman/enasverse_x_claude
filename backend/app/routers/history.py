@@ -10,7 +10,7 @@ from app.models.chat import ChatSession, ChatMessage
 from app.models.user import User
 from app.schemas.chat import ChatSessionOut
 from app.services.auth import get_current_user
-from app.main import limiter
+from app.limiter import limiter
 from fastapi import Request
 
 router = APIRouter(prefix="/history", tags=["history"])
