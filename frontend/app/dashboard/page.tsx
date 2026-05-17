@@ -1,8 +1,10 @@
 'use client'
+
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import api from '@/lib/api'
 import { useAuthStore } from '@/store/auth'
+import ChatHistory from '@/components/ChatHistory'
 
 type Tab = 'query' | 'agent' | 'upload' | 'indexer'
 
@@ -10,6 +12,7 @@ export default function DashboardPage() {
   const router = useRouter()
   const { token, logout } = useAuthStore()
   const [tab, setTab] = useState<Tab>('query')
+  const [showHistory, setShowHistory] = useState(false)
   const [user, setUser] = useState<{email: string; full_name: string} | null>(null)
 
   // Query state
@@ -78,122 +81,140 @@ export default function DashboardPage() {
     finally { setIndexLoading(false) }
   }
 
-  const tabs: {id: Tab; label: string; icon: string}[] = [
-    { id: 'query', label: 'Chat RAG', icon: '💬' },
-    { id: 'agent', label: 'Agent', icon: '🤖' },
-    { id: 'upload', label: 'Upload Dokumen', icon: '📄' },
-    { id: 'indexer', label: 'Index Repo', icon: '🗂️' },
-  ]
-
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
-      <nav className="bg-gray-900 border-b border-gray-800 px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <span className="text-xl font-bold text-indigo-400">Enasverse</span>
-          <span className="text-gray-600">|</span>
-          <span className="text-gray-400 text-sm">Dashboard</span>
-        </div>
-        <div className="flex items-center gap-4">
-          {user && <span className="text-gray-400 text-sm">{user.email}</span>}
-          <button onClick={() => { logout(); router.push('/login') }}
-            className="text-gray-400 hover:text-white text-sm transition">Keluar</button>
-        </div>
-      </nav>
+    <>
+      <div className="min-h-screen bg-gray-950 text-white flex flex-col">
+        {/* Navbar */}
+        <nav className="flex items-center justify-between px-6 py-4 border-b border-gray-800 bg-gray-900">
+          <div className="flex items-center gap-2">
+            <span className="text-indigo-400 font-bold text-lg">Enasverse</span>
+            {user && <span className="text-gray-500 text-sm ml-2">{user.email}</span>}
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowHistory(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg text-sm transition-colors"
+            >
+              Riwayat Chat
+            </button>
+            <button
+              onClick={() => { logout(); router.push('/login') }}
+              className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm transition-colors"
+            >
+              Logout
+            </button>
+          </div>
+        </nav>
 
-      <div className="max-w-4xl mx-auto p-6">
-        <div className="flex gap-2 mb-6 bg-gray-900 p-1 rounded-xl border border-gray-800">
-          {tabs.map(t => (
-            <button key={t.id} onClick={() => setTab(t.id)}
-              className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition ${
-                tab === t.id ? 'bg-indigo-600 text-white' : 'text-gray-400 hover:text-white'}`}>
-              {t.icon} {t.label}
+        {/* Tabs */}
+        <div className="flex gap-1 px-6 pt-4">
+          {(['query', 'agent', 'upload', 'indexer'] as Tab[]).map(t => (
+            <button
+              key={t}
+              onClick={() => setTab(t)}
+              className={`px-4 py-2 rounded-lg text-sm capitalize transition-colors ${
+                tab === t ? 'bg-indigo-600 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+              }`}
+            >
+              {t === 'query' ? 'Tanya' : t === 'agent' ? 'Agent' : t === 'upload' ? 'Upload Dokumen' : 'Index GitHub'}
             </button>
           ))}
         </div>
 
-        {tab === 'query' && (
-          <div className="space-y-4">
-            <h2 className="text-lg font-semibold">Chat dengan RAG</h2>
-            <form onSubmit={handleQuery} className="space-y-3">
-              <textarea value={question} onChange={e => setQuestion(e.target.value)}
-                className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500 resize-none"
-                rows={3} placeholder="Tanya sesuatu..." required />
-              <button type="submit" disabled={queryLoading}
-                className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white px-6 py-2 rounded-lg transition">
-                {queryLoading ? 'Memproses...' : 'Kirim'}
-              </button>
-            </form>
-            {queryResult && (
-              <div className="bg-gray-900 border border-gray-700 rounded-xl p-4 text-gray-200 whitespace-pre-wrap">
-                {queryResult}
-              </div>
-            )}
-          </div>
-        )}
+        {/* Content */}
+        <div className="flex-1 px-6 py-6 max-w-3xl w-full mx-auto">
 
-        {tab === 'agent' && (
-          <div className="space-y-4">
-            <h2 className="text-lg font-semibold">Jalankan Agent</h2>
-            <div className="bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 rounded-lg p-3 text-sm">
-              ⚠️ Agent bisa membaca dan menulis file. Pastikan task yang diberikan aman.
+          {tab === 'query' && (
+            <div className="space-y-4">
+              <h2 className="text-lg font-semibold">Tanya AI</h2>
+              <form onSubmit={handleQuery} className="space-y-3">
+                <input
+                  value={question}
+                  onChange={e => setQuestion(e.target.value)}
+                  className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500"
+                  placeholder="Tulis pertanyaanmu..." required
+                />
+                <button type="submit" disabled={queryLoading}
+                  className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white px-6 py-2 rounded-lg transition">
+                  {queryLoading ? 'Memproses...' : 'Tanya'}
+                </button>
+              </form>
+              {queryResult && (
+                <div className="rounded-lg p-4 text-sm bg-gray-800 border border-gray-700 text-gray-100 whitespace-pre-wrap">
+                  {queryResult}
+                </div>
+              )}
             </div>
-            <form onSubmit={handleAgent} className="space-y-3">
-              <textarea value={task} onChange={e => setTask(e.target.value)}
-                className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500 resize-none"
-                rows={3} placeholder="Contoh: Cari bug di file main.py dan jelaskan" required />
-              <button type="submit" disabled={agentLoading}
-                className="bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white px-6 py-2 rounded-lg transition">
-                {agentLoading ? 'Agent berjalan...' : 'Jalankan Agent'}
-              </button>
-            </form>
-            {agentResult && (
-              <div className="bg-gray-900 border border-gray-700 rounded-xl p-4 text-gray-200 whitespace-pre-wrap">
-                {agentResult}
-              </div>
-            )}
-          </div>
-        )}
+          )}
 
-        {tab === 'upload' && (
-          <div className="space-y-4">
-            <h2 className="text-lg font-semibold">Upload Dokumen</h2>
-            <form onSubmit={handleUpload} className="space-y-3">
-              <textarea value={uploadText} onChange={e => setUploadText(e.target.value)}
-                className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500 resize-none"
-                rows={6} placeholder="Paste konten dokumen di sini..." required />
-              <button type="submit"
-                className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg transition">
-                Index Dokumen
-              </button>
-            </form>
-            {uploadMsg && (
-              <div className={`rounded-lg p-3 text-sm ${uploadMsg.includes('berhasil') ? 'bg-green-500/10 border border-green-500/30 text-green-400' : 'bg-red-500/10 border border-red-500/30 text-red-400'}`}>
-                {uploadMsg}
-              </div>
-            )}
-          </div>
-        )}
+          {tab === 'agent' && (
+            <div className="space-y-4">
+              <h2 className="text-lg font-semibold">Agent Task</h2>
+              <form onSubmit={handleAgent} className="space-y-3">
+                <input
+                  value={task}
+                  onChange={e => setTask(e.target.value)}
+                  className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500"
+                  placeholder="Deskripsi task untuk agent..." required
+                />
+                <button type="submit" disabled={agentLoading}
+                  className="bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white px-6 py-2 rounded-lg transition">
+                  {agentLoading ? 'Menjalankan...' : 'Jalankan Agent'}
+                </button>
+              </form>
+              {agentResult && (
+                <div className="rounded-lg p-4 text-sm bg-gray-800 border border-gray-700 text-gray-100 whitespace-pre-wrap">
+                  {agentResult}
+                </div>
+              )}
+            </div>
+          )}
 
-        {tab === 'indexer' && (
-          <div className="space-y-4">
-            <h2 className="text-lg font-semibold">Index GitHub Repo</h2>
-            <form onSubmit={handleIndex} className="space-y-3">
-              <input value={repo} onChange={e => setRepo(e.target.value)}
-                className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500"
-                placeholder="username/repo-name" required />
-              <button type="submit" disabled={indexLoading}
-                className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white px-6 py-2 rounded-lg transition">
-                {indexLoading ? 'Mengindeks...' : 'Index Repo'}
-              </button>
-            </form>
-            {indexMsg && (
-              <div className={`rounded-lg p-3 text-sm ${indexMsg.includes('berhasil') ? 'bg-green-500/10 border border-green-500/30 text-green-400' : 'bg-red-500/10 border border-red-500/30 text-red-400'}`}>
-                {indexMsg}
-              </div>
-            )}
-          </div>
-        )}
+          {tab === 'upload' && (
+            <div className="space-y-4">
+              <h2 className="text-lg font-semibold">Upload Dokumen</h2>
+              <form onSubmit={handleUpload} className="space-y-3">
+                <textarea
+                  value={uploadText} onChange={e => setUploadText(e.target.value)}
+                  className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500 resize-none"
+                  rows={6} placeholder="Paste konten dokumen di sini..." required />
+                <button type="submit"
+                  className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg transition">
+                  Index Dokumen
+                </button>
+              </form>
+              {uploadMsg && (
+                <div className={`rounded-lg p-3 text-sm ${uploadMsg.includes('berhasil') ? 'bg-green-500/10 border border-green-500/30 text-green-400' : 'bg-red-500/10 border border-red-500/30 text-red-400'}`}>
+                  {uploadMsg}
+                </div>
+              )}
+            </div>
+          )}
+
+          {tab === 'indexer' && (
+            <div className="space-y-4">
+              <h2 className="text-lg font-semibold">Index GitHub Repo</h2>
+              <form onSubmit={handleIndex} className="space-y-3">
+                <input
+                  value={repo} onChange={e => setRepo(e.target.value)}
+                  className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500"
+                  placeholder="username/repo-name" required />
+                <button type="submit" disabled={indexLoading}
+                  className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white px-6 py-2 rounded-lg transition">
+                  {indexLoading ? 'Mengindeks...' : 'Index Repo'}
+                </button>
+              </form>
+              {indexMsg && (
+                <div className={`rounded-lg p-3 text-sm ${indexMsg.includes('berhasil') ? 'bg-green-500/10 border border-green-500/30 text-green-400' : 'bg-red-500/10 border border-red-500/30 text-red-400'}`}>
+                  {indexMsg}
+                </div>
+              )}
+            </div>
+          )}
+
+        </div>
       </div>
-    </div>
+      <ChatHistory isOpen={showHistory} onClose={() => setShowHistory(false)} />
+    </>
   )
 }
