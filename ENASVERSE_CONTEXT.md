@@ -2,7 +2,7 @@
 > Dokumen ini adalah "otak" project Enasverse.
 > Selalu upload file ini di awal setiap sesi baru bersama Claude.
 > Claude akan update file ini langsung di Codespaces setiap akhir sesi.
-> Keyword sesi baru: "enasverse load context: https://raw.githubusercontent.com/bangdul-rohman/enasverse_x_claude/main/ENASVERSE_CONTEXT.md"
+> Keyword sesi baru: "enasverse load context: https://raw.githubusercontent.com/bangdul-rohman/enasverse_x_claude/main/ENASVERSE_CONTEXT.md?v=9"
 
 ---
 
@@ -13,7 +13,7 @@
 | Nama project | Enasverse |
 | Tipe | Produk SaaS — multi-tenant |
 | Tujuan utama | Sistem memori persisten + agentic AI berbasis Claude |
-| Status | ✅ SEMUA 10 PHASE SELESAI — Phase 1,2,3,4,5,6,7,8,9,10 DONE |
+| Status | Phase 1-10 DONE — Phase 11 backend selesai |
 | Dibuat | 2026-05-14 |
 | Terakhir diupdate | 2026-05-18 |
 
@@ -64,30 +64,36 @@
 | 8 | Monitoring Betterstack | DONE |
 | 9 | Rate limiting & security | DONE |
 | 10 | Frontend Next.js + Vercel | DONE |
+| 11 | Chat history persistence | Backend DONE — Frontend TODO |
 
 ---
 
-## 5. Struktur Folder
+## 5. Phase 11 — Chat History Persistence
+
+### Backend (DONE)
+- `app/models/chat.py` — ChatSession + ChatMessage (tanpa FK constraint)
+- `app/schemas/chat.py` — Pydantic schemas
+- `app/routers/history.py` — GET/DELETE sessions + export JSON
+- `app/routers/query.py` — auto-save ke PostgreSQL + index ke Qdrant
+- `app/limiter.py` — limiter dipindah dari main.py (fix circular import)
+
+### Frontend (TODO — next session)
+- Sidebar history (list sesi chat)
+- Tampilan per sesi (bubble chat)
+- Search history via Qdrant
+- Export history (JSON)
+
+### API Endpoints Baru
+```
+GET  /history/sessions          — list semua sesi user
+GET  /history/sessions/{id}     — detail sesi + messages
+DELETE /history/sessions/{id}   — hapus sesi
+GET  /history/export/{id}       — export JSON
+```
+
 ---
 
-## 6. API Endpoints
----
-
-## 7. Security & Rate Limiting
-
-| Endpoint | Limit |
-|----------|-------|
-| login + register | 5/minute |
-| query | 20/minute |
-| agent/run | 10/minute |
-| global | 200/minute |
-
-Security headers aktif: X-Frame-Options, X-Content-Type-Options, HSTS, XSS-Protection, Referrer-Policy.
-IP detection via x-forwarded-for (Railway proxy aware).
-
----
-
-## 8. Infrastructure
+## 6. Infrastructure
 
 ### Railway
 - URL: https://enasversexclaude-production.up.railway.app
@@ -96,53 +102,44 @@ IP detection via x-forwarded-for (Railway proxy aware).
 ### Vercel
 - Root directory: `frontend`
 - Env: NEXT_PUBLIC_API_URL=https://enasversexclaude-production.up.railway.app
-- Auto-deploy on push ke main
 
 ### Qdrant Cloud
 - Collection: enasverse_docs (dim=384)
-- Free tier, AWS Ohio
 
 ### Betterstack
-- Source: Enasverse (Python)
-- Ingesting host: s2444508.eu-fsn-3.betterstackdata.com
 - Token: 53JpK51wXd2N8DpDibL3x3qT
+- Host: s2444508.eu-fsn-3.betterstackdata.com
 
 ### GitHub Webhook
 - URL: https://enasversexclaude-production.up.railway.app/indexer/github/webhook
 
 ---
 
-## 9. Railway Environment Variables
-
-ANTHROPIC_API_KEY, APP_ENV=production, APP_NAME=enasverse,
-BETTERSTACK_TOKEN=53JpK51wXd2N8DpDibL3x3qT, DATABASE_URL,
-GITHUB_TOKEN, QDRANT_API_KEY, QDRANT_COLLECTION=enasverse_docs,
-QDRANT_URL, SECRET_KEY
-
----
-
-## 10. Hal JANGAN Diulang
+## 7. Hal JANGAN Diulang
 
 - bcrypt harus versi 4.0.1
 - anthropic SDK harus versi terbaru
-- Railway deploy pakai Dockerfile (bukan nixpacks)
-- DATABASE_URL pakai public URL Railway (bukan .railway.internal)
-- Vector dim = 384 (MiniLM, bukan 1536)
+- Railway deploy pakai Dockerfile
+- DATABASE_URL pakai public URL Railway
+- Vector dim = 384 (MiniLM)
 - Betterstack: custom HTTP handler, token DibL bukan DlbL
-- Rate limiting: x-forwarded-for (bukan get_remote_address)
-- Saat tambah rate limit ke router: jangan hapus Depends dan HTTPException
-- Vercel root directory: frontend (bukan ./)
+- Rate limiting: x-forwarded-for (Railway proxy)
+- Jangan hapus Depends dan HTTPException saat tambah rate limit
+- Vercel root directory: frontend
 - .env dan .env.local TIDAK di-commit
+- limiter ada di app/limiter.py (bukan app/main.py) — circular import!
+- chat_sessions: user_id pakai String tanpa ForeignKey (UUID vs VARCHAR conflict)
+- config.py default DATABASE_URL harus pakai credentials docker: enasverse:enasverse
 
 ---
 
-## 11. Cara Dev Lokal
+## 8. Dev Lokal (Codespaces)
 
 ```bash
 # Backend
 cd /workspaces/enasverse_x_claude/backend
 docker compose up -d
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8002
+fuser -k 8002/tcp 2>/dev/null; uvicorn app.main:app --host 0.0.0.0 --port 8002
 
 # Frontend
 cd /workspaces/enasverse_x_claude/frontend
@@ -151,15 +148,16 @@ npm run dev -- --port 3000
 
 ---
 
-## 12. Progress Sesi
+## 9. Progress Sesi
 
 - Sesi 1-2 (2026-05-14): Phase 1-6 selesai
 - Sesi 3-4 (2026-05-16): Deploy Railway, production live
 - Sesi 5 (2026-05-17): Betterstack monitoring
 - Sesi 6 (2026-05-17): Rate limiting + security headers
-- Sesi 7 (2026-05-18): Frontend Next.js + deploy Vercel — SEMUA PHASE SELESAI
+- Sesi 7 (2026-05-18): Frontend Next.js + deploy Vercel
+- Sesi 8 (2026-05-18): Phase 11 backend — chat history persistence
+- **Next:** Phase 11 frontend — sidebar history + search + export
 
 ---
 
 *Diupdate otomatis oleh Claude di akhir setiap sesi.*
-
