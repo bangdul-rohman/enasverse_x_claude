@@ -30,7 +30,7 @@ async def register(request: Request, body: UserRegister, db: AsyncSession = Depe
         id=str(uuid.uuid4()),
         email=body.email,
         hashed_password=hash_password(body.password),
-        tenant_id=str(uuid.uuid4(,
+        tenant_id=str(uuid.uuid4()),
         plan="free"
     )
     db.add(user)
