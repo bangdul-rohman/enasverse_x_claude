@@ -8,6 +8,9 @@ from slowapi.errors import RateLimitExceeded
 from contextlib import asynccontextmanager
 from app.config import get_settings
 from app.database import engine, Base
+from app.models.audit import AuditLog  # noqa - trigger table creation
+from app.models.usage import UsageLog  # noqa
+from app.models.api_key import APIKey  # noqa
 from app.services.retriever import init_collection
 from app.routers import (api_keys, usage, billing, admin, query, documents, auth, agent, indexer, history)
 from app.models import chat
