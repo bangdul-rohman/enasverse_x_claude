@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import api from '@/lib/api'
 import { useAuthStore } from '@/store/auth'
 import ChatHistory from '@/components/ChatHistory'
+import FileUpload from '@/components/FileUpload'
 
 type Tab = 'query' | 'agent' | 'upload' | 'indexer'
 
@@ -15,21 +16,14 @@ export default function DashboardPage() {
   const [showHistory, setShowHistory] = useState(false)
   const [user, setUser] = useState<{email: string; full_name: string} | null>(null)
 
-  // Query state
   const [question, setQuestion] = useState('')
   const [queryResult, setQueryResult] = useState('')
   const [queryLoading, setQueryLoading] = useState(false)
 
-  // Agent state
   const [task, setTask] = useState('')
   const [agentResult, setAgentResult] = useState('')
   const [agentLoading, setAgentLoading] = useState(false)
 
-  // Upload state
-  const [uploadText, setUploadText] = useState('')
-  const [uploadMsg, setUploadMsg] = useState('')
-
-  // Indexer state
   const [repo, setRepo] = useState('')
   const [indexMsg, setIndexMsg] = useState('')
   const [indexLoading, setIndexLoading] = useState(false)
@@ -61,15 +55,6 @@ export default function DashboardPage() {
     finally { setAgentLoading(false) }
   }
 
-  const handleUpload = async (e: React.FormEvent) => {
-    e.preventDefault()
-    try {
-      await api.post('/documents/index', { content: uploadText, tenant_id: 'tenant-1', metadata: {} })
-      setUploadMsg('Dokumen berhasil diindeks!')
-      setUploadText('')
-    } catch { setUploadMsg('Gagal mengindeks dokumen.') }
-  }
-
   const handleIndex = async (e: React.FormEvent) => {
     e.preventDefault()
     setIndexLoading(true)
@@ -84,7 +69,6 @@ export default function DashboardPage() {
   return (
     <>
       <div className="min-h-screen bg-gray-950 text-white flex flex-col">
-        {/* Navbar */}
         <nav className="flex items-center justify-between px-6 py-4 border-b border-gray-800 bg-gray-900">
           <div className="flex items-center gap-2">
             <span className="text-indigo-400 font-bold text-lg">Enasverse</span>
@@ -106,7 +90,6 @@ export default function DashboardPage() {
           </div>
         </nav>
 
-        {/* Tabs */}
         <div className="flex gap-1 px-6 pt-4">
           {(['query', 'agent', 'upload', 'indexer'] as Tab[]).map(t => (
             <button
@@ -116,12 +99,11 @@ export default function DashboardPage() {
                 tab === t ? 'bg-indigo-600 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
               }`}
             >
-              {t === 'query' ? 'Tanya' : t === 'agent' ? 'Agent' : t === 'upload' ? 'Upload Dokumen' : 'Index GitHub'}
+              {t === 'query' ? 'Tanya AI' : t === 'agent' ? 'Agent' : t === 'upload' ? 'Upload File' : 'Index GitHub'}
             </button>
           ))}
         </div>
 
-        {/* Content */}
         <div className="flex-1 px-6 py-6 max-w-3xl w-full mx-auto">
 
           {tab === 'query' && (
@@ -170,26 +152,7 @@ export default function DashboardPage() {
             </div>
           )}
 
-          {tab === 'upload' && (
-            <div className="space-y-4">
-              <h2 className="text-lg font-semibold">Upload Dokumen</h2>
-              <form onSubmit={handleUpload} className="space-y-3">
-                <textarea
-                  value={uploadText} onChange={e => setUploadText(e.target.value)}
-                  className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500 resize-none"
-                  rows={6} placeholder="Paste konten dokumen di sini..." required />
-                <button type="submit"
-                  className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg transition">
-                  Index Dokumen
-                </button>
-              </form>
-              {uploadMsg && (
-                <div className={`rounded-lg p-3 text-sm ${uploadMsg.includes('berhasil') ? 'bg-green-500/10 border border-green-500/30 text-green-400' : 'bg-red-500/10 border border-red-500/30 text-red-400'}`}>
-                  {uploadMsg}
-                </div>
-              )}
-            </div>
-          )}
+          {tab === 'upload' && <FileUpload />}
 
           {tab === 'indexer' && (
             <div className="space-y-4">
