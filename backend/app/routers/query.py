@@ -1,3 +1,4 @@
+from app.utils.cache import query_cache
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel
 from typing import Optional
