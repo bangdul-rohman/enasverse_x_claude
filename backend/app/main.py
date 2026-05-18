@@ -53,16 +53,6 @@ app = FastAPI(
 )
 
 
-@app.exception_handler(Exception)
-async def global_exception_handler(request, exc):
-    tb = traceback.format_exc()
-    logging.error(f"Unhandled exception: {exc}
-{tb}")
-    return JSONResponse(
-        status_code=500,
-        content={"detail": str(exc), "traceback": tb[-500:]}
-    )
-
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
