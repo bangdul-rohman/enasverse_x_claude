@@ -44,7 +44,12 @@ export default function LoginPage() {
               placeholder="kamu@email.com" required />
           </div>
           <div>
-            <label className="text-gray-400 text-sm mb-1 block">Password</label>
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-gray-400 text-sm">Password</label>
+              <a href="/forgot-password" className="text-indigo-400 hover:text-indigo-300 text-xs">
+                Lupa password?
+              </a>
+            </div>
             <input type="password" value={password} onChange={e => setPassword(e.target.value)}
               className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-indigo-500"
               placeholder="••••••••" required />
