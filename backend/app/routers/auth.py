@@ -85,7 +85,7 @@ async def forgot_password(request: Request, body: ForgotPasswordRequest, db: Asy
         )
         db.add(reset_token)
         await db.commit()
-        frontend_url = getattr(settings, 'FRONTEND_URL', 'https://enasverse-x-claude.vercel.app')
+        frontend_url = settings.frontend_url
         reset_link = f"{frontend_url}/reset-password?token={raw_token}"
         try:
             send_reset_email(body.email, reset_link)
