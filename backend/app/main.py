@@ -11,6 +11,7 @@ from app.database import engine, Base
 from app.models.audit import AuditLog  # noqa - trigger table creation
 from app.models.usage import UsageLog  # noqa
 from app.models.api_key import APIKey  # noqa
+from app.models.password_reset import PasswordResetToken  # noqa
 from app.services.retriever import init_collection
 from app.routers import (api_keys, usage, billing, admin, query, documents, auth, agent, indexer, history)
 from app.models import chat
