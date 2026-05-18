@@ -4,9 +4,12 @@ from email.mime.multipart import MIMEMultipart
 from app.config import settings
 
 def send_reset_email(to_email: str, reset_link: str):
+    gmail_user = settings.gmail_user
+    gmail_password = settings.gmail_app_password
+
     msg = MIMEMultipart("alternative")
     msg["Subject"] = "Reset Password Enasverse"
-    msg["From"] = settings.GMAIL_USER
+    msg["From"] = f"Enasverse <{gmail_user}>"
     msg["To"] = to_email
 
     html = f"""
@@ -20,7 +23,6 @@ def send_reset_email(to_email: str, reset_link: str):
                 Reset Password
             </a>
             <p style="color: #6b7280; font-size: 12px;">Jika kamu tidak meminta reset password, abaikan email ini.</p>
-            <p style="color: #6b7280; font-size: 12px;">Link: {reset_link}</p>
         </div>
     </body>
     </html>
@@ -29,5 +31,5 @@ def send_reset_email(to_email: str, reset_link: str):
     msg.attach(MIMEText(html, "html"))
 
     with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
-        server.login(settings.GMAIL_USER, settings.GMAIL_APP_PASSWORD)
-        server.sendmail(settings.GMAIL_USER, to_email, msg.as_string())
+        server.login(gmail_user, gmail_password)
+        server.sendmail(gmail_user, to_email, msg.as_string())
