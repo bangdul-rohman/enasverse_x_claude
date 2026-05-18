@@ -24,9 +24,16 @@ class Settings(BaseSettings):
     betterstack_token: str = ""
     betterstack_host: str = "s2444508.eu-fsn-3.betterstackdata.com"
 
+    # Email / Password Reset
+    gmail_user: str = ""
+    gmail_app_password: str = ""
+    frontend_url: str = "https://enasverse-x-claude.vercel.app"
+
     class Config:
         env_file = ".env"
 
 @lru_cache()
 def get_settings():
     return Settings()
+
+settings = get_settings()
