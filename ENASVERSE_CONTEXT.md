@@ -2,7 +2,7 @@
 > Dokumen ini adalah "otak" project Enasverse.
 > Selalu upload file ini di awal setiap sesi baru bersama Claude.
 > Claude akan update file ini langsung di Codespaces setiap akhir sesi.
-> Keyword sesi baru: "enasverse load context: https://raw.githubusercontent.com/bangdul-rohman/enasverse_x_claude/main/ENASVERSE_CONTEXT.md?v=9"
+> Keyword sesi baru: "enasverse load context: https://raw.githubusercontent.com/bangdul-rohman/enasverse_x_claude/main/ENASVERSE_CONTEXT.md?v=10"
 
 ---
 
@@ -13,7 +13,7 @@
 | Nama project | Enasverse |
 | Tipe | Produk SaaS — multi-tenant |
 | Tujuan utama | Sistem memori persisten + agentic AI berbasis Claude |
-| Status | Phase 1-10 DONE — Phase 11 backend selesai |
+| Status | Phase 1-11 DONE |
 | Dibuat | 2026-05-14 |
 | Terakhir diupdate | 2026-05-18 |
 
@@ -64,11 +64,11 @@
 | 8 | Monitoring Betterstack | DONE |
 | 9 | Rate limiting & security | DONE |
 | 10 | Frontend Next.js + Vercel | DONE |
-| 11 | Chat history persistence | Backend DONE — Frontend TODO |
+| 11 | Chat history persistence | DONE |
 
 ---
 
-## 5. Phase 11 — Chat History Persistence
+## 5. Phase 11 — Chat History Persistence (DONE)
 
 ### Backend (DONE)
 - `app/models/chat.py` — ChatSession + ChatMessage (tanpa FK constraint)
@@ -77,13 +77,12 @@
 - `app/routers/query.py` — auto-save ke PostgreSQL + index ke Qdrant
 - `app/limiter.py` — limiter dipindah dari main.py (fix circular import)
 
-### Frontend (TODO — next session)
-- Sidebar history (list sesi chat)
-- Tampilan per sesi (bubble chat)
-- Search history via Qdrant
-- Export history (JSON)
+### Frontend (DONE)
+- `frontend/components/ChatHistory.tsx` — sidebar list sesi + bubble chat view
+- `frontend/app/dashboard/page.tsx` — tombol "Riwayat Chat" + integrasi ChatHistory modal
+- Fitur: list sesi, bubble chat, search, export JSON, delete dengan konfirmasi
 
-### API Endpoints Baru
+### API Endpoints History
 ```
 GET  /history/sessions          — list semua sesi user
 GET  /history/sessions/{id}     — detail sesi + messages
@@ -130,6 +129,7 @@ GET  /history/export/{id}       — export JSON
 - limiter ada di app/limiter.py (bukan app/main.py) — circular import!
 - chat_sessions: user_id pakai String tanpa ForeignKey (UUID vs VARCHAR conflict)
 - config.py default DATABASE_URL harus pakai credentials docker: enasverse:enasverse
+- Tulis file TSX/Python besar via base64 + clipboard paste, jangan heredoc (unicode error)
 
 ---
 
@@ -156,7 +156,8 @@ npm run dev -- --port 3000
 - Sesi 6 (2026-05-17): Rate limiting + security headers
 - Sesi 7 (2026-05-18): Frontend Next.js + deploy Vercel
 - Sesi 8 (2026-05-18): Phase 11 backend — chat history persistence
-- **Next:** Phase 11 frontend — sidebar history + search + export
+- Sesi 9 (2026-05-18): Phase 11 frontend — ChatHistory.tsx + dashboard integration, build OK, pushed to GitHub
+- **Next:** Cek Vercel deployment, test fitur history di production
 
 ---
 
