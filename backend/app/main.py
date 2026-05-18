@@ -16,6 +16,7 @@ from app.routers import (api_keys, usage, billing, admin, query, documents, auth
 from app.models import chat
 from app.logger import setup_logger
 import logging
+import traceback
 
 settings = get_settings()
 
@@ -50,6 +51,17 @@ app = FastAPI(
     version="0.1.0",
     lifespan=lifespan,
 )
+
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request, exc):
+    tb = traceback.format_exc()
+    logging.error(f"Unhandled exception: {exc}
+{tb}")
+    return JSONResponse(
+        status_code=500,
+        content={"detail": str(exc), "traceback": tb[-500:]}
+    )
 
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
