@@ -27,6 +27,7 @@ class Settings(BaseSettings):
     # Email / Password Reset
     gmail_user: str = ""
     gmail_app_password: str = ""
+    resend_api_key: str = ""
     frontend_url: str = "https://enasverse-x-claude.vercel.app"
 
     class Config:
