@@ -1,3 +1,4 @@
+from app.models.audit import AuditLog  # noqa
 from app.models.usage import UsageLog  # noqa
 from app.models.api_key import APIKey  # noqa
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
