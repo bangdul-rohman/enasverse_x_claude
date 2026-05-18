@@ -21,3 +21,4 @@ PyGithub==2.3.0
 logtail-python==0.3.1
 slowapi==0.1.9
 pypdf==4.3.1\npython-docx==1.1.2
+stripe==10.5.0
