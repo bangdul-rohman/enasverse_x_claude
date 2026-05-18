@@ -1,3 +1,4 @@
+from app.models.api_key import APIKey  # noqa
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import declarative_base, sessionmaker
 from app.config import get_settings

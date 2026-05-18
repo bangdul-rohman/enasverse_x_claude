@@ -9,7 +9,8 @@ from contextlib import asynccontextmanager
 from app.config import get_settings
 from app.database import engine, Base
 from app.services.retriever import init_collection
-from app.routers import query, documents, auth, agent, indexer, history
+from app.routers import api_keys,
+     query, documents, auth, agent, indexer, history
 from app.models import chat
 from app.logger import setup_logger
 import logging
@@ -59,6 +60,7 @@ async def security_headers(request: Request, call_next):
 
 app.include_router(auth.router)
 app.include_router(query.router)
+app.include_router(api_keys.router)
 app.include_router(documents.router)
 app.include_router(agent.router)
 app.include_router(indexer.router)
